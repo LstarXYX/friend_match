@@ -25,7 +25,7 @@ public class UserAddRequest implements Serializable {
     /**
      * 用户头像
      */
-    private String userAvatar;
+    private String avatarUrl;
 
     /**
      * 性别
@@ -40,7 +40,7 @@ public class UserAddRequest implements Serializable {
     /**
      * 密码
      */
-    private String userPassword;
+    private String password;
 
     private static final long serialVersionUID = 1L;
 }

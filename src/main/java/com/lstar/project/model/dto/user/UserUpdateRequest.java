@@ -15,7 +15,7 @@ public class UserUpdateRequest implements Serializable {
     /**
      * id
      */
-    private Long id;
+    private Long recId;
 
     /**
      * 用户昵称
@@ -30,7 +30,7 @@ public class UserUpdateRequest implements Serializable {
     /**
      * 用户头像
      */
-    private String userAvatar;
+    private String avatarUrl;
 
     /**
      * 性别
@@ -45,7 +45,7 @@ public class UserUpdateRequest implements Serializable {
     /**
      * 密码
      */
-    private String userPassword;
+    private String password;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;

@@ -47,12 +47,12 @@ public class UserController {
             throw new AppException(Code.PARAMS_ERROR);
         }
         String userAccount = userRegisterRequest.getUserAccount();
-        String userPassword = userRegisterRequest.getUserPassword();
+        String password = userRegisterRequest.getPassword();
         String checkPassword = userRegisterRequest.getCheckPassword();
-        if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
+        if (StringUtils.isAnyBlank(userAccount, password, checkPassword)) {
             return null;
         }
-        long result = userService.userRegister(userAccount, userPassword, checkPassword);
+        long result = userService.userRegister(userAccount, password, checkPassword);
         return ResultUtils.success(result);
     }
 
@@ -69,11 +69,11 @@ public class UserController {
             throw new AppException(Code.PARAMS_ERROR);
         }
         String userAccount = userLoginRequest.getUserAccount();
-        String userPassword = userLoginRequest.getUserPassword();
-        if (StringUtils.isAnyBlank(userAccount, userPassword)) {
+        String password = userLoginRequest.getPassword();
+        if (StringUtils.isAnyBlank(userAccount, password)) {
             throw new AppException(Code.PARAMS_ERROR);
         }
-        User user = userService.userLogin(userAccount, userPassword, request);
+        User user = userService.userLogin(userAccount, password, request);
         return ResultUtils.success(user);
     }
 
@@ -128,7 +128,7 @@ public class UserController {
         if (!result) {
             throw new AppException(Code.OPERATION_ERROR);
         }
-        return ResultUtils.success(user.getId());
+        return ResultUtils.success(user.getRecId());
     }
 
     /**
@@ -140,10 +140,10 @@ public class UserController {
      */
     @PostMapping("/delete")
     public Response<Boolean> deleteUser(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
-        if (deleteRequest == null || deleteRequest.getId() <= 0) {
+        if (deleteRequest == null || deleteRequest.getRecId() <= 0) {
             throw new AppException(Code.PARAMS_ERROR);
         }
-        boolean b = userService.removeById(deleteRequest.getId());
+        boolean b = userService.removeById(deleteRequest.getRecId());
         return ResultUtils.success(b);
     }
 
@@ -156,7 +156,7 @@ public class UserController {
      */
     @PostMapping("/update")
     public Response<Boolean> updateUser(@RequestBody UserUpdateRequest userUpdateRequest, HttpServletRequest request) {
-        if (userUpdateRequest == null || userUpdateRequest.getId() == null) {
+        if (userUpdateRequest == null || userUpdateRequest.getRecId() == null) {
             throw new AppException(Code.PARAMS_ERROR);
         }
         User user = new User();

@@ -30,7 +30,7 @@ public class UserVO implements Serializable {
     /**
      * 用户头像
      */
-    private String userAvatar;
+    private String avatarUrl;
 
     /**
      * 性别
@@ -50,7 +50,7 @@ public class UserVO implements Serializable {
     /**
      * 更新时间
      */
-    private Date updateTime;
+    private Date modifyTime;
 
     private static final long serialVersionUID = 1L;
 }

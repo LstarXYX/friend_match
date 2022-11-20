@@ -38,19 +38,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     private static final String SALT = "lstar";
 
     @Override
-    public long userRegister(String userAccount, String userPassword, String checkPassword) {
+    public long userRegister(String userAccount, String password, String checkPassword) {
         // 1. 校验
-        if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
+        if (StringUtils.isAnyBlank(userAccount, password, checkPassword)) {
             throw new AppException(Code.PARAMS_ERROR, "参数为空");
         }
         if (userAccount.length() < 4) {
             throw new AppException(Code.PARAMS_ERROR, "用户账号过短");
         }
-        if (userPassword.length() < 8 || checkPassword.length() < 8) {
+        if (password.length() < 8 || checkPassword.length() < 8) {
             throw new AppException(Code.PARAMS_ERROR, "用户密码过短");
         }
         // 密码和校验密码相同
-        if (!userPassword.equals(checkPassword)) {
+        if (!password.equals(checkPassword)) {
             throw new AppException(Code.PARAMS_ERROR, "两次输入的密码不一致");
         }
         synchronized (userAccount.intern()) {
@@ -62,41 +62,41 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
                 throw new AppException(Code.PARAMS_ERROR, "账号重复");
             }
             // 2. 加密
-            String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
+            String encryptPassword = DigestUtils.md5DigestAsHex((SALT + password).getBytes());
             // 3. 插入数据
             User user = new User();
             user.setUserAccount(userAccount);
-            user.setUserPassword(encryptPassword);
+            user.setPassword(encryptPassword);
             boolean saveResult = this.save(user);
             if (!saveResult) {
                 throw new AppException(Code.SYSTEM_ERROR, "注册失败，数据库错误");
             }
-            return user.getId();
+            return user.getRecId();
         }
     }
 
     @Override
-    public User userLogin(String userAccount, String userPassword, HttpServletRequest request) {
+    public User userLogin(String userAccount, String password, HttpServletRequest request) {
         // 1. 校验
-        if (StringUtils.isAnyBlank(userAccount, userPassword)) {
+        if (StringUtils.isAnyBlank(userAccount, password)) {
             throw new AppException(Code.PARAMS_ERROR, "参数为空");
         }
         if (userAccount.length() < 4) {
             throw new AppException(Code.PARAMS_ERROR, "账号错误");
         }
-        if (userPassword.length() < 8) {
+        if (password.length() < 8) {
             throw new AppException(Code.PARAMS_ERROR, "密码错误");
         }
         // 2. 加密
-        String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
+        String encryptPassword = DigestUtils.md5DigestAsHex((SALT + password).getBytes());
         // 查询用户是否存在
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("userAccount", userAccount);
-        queryWrapper.eq("userPassword", encryptPassword);
+        queryWrapper.eq("password", encryptPassword);
         User user = userMapper.selectOne(queryWrapper);
         // 用户不存在
         if (user == null) {
-            log.info("user login failed, userAccount cannot match userPassword");
+            log.info("user login failed, userAccount cannot match password");
             throw new AppException(Code.PARAMS_ERROR, "用户不存在或密码错误");
         }
         // 3. 记录用户的登录态
@@ -115,11 +115,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         // 先判断是否已登录
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
         User currentUser = (User) userObj;
-        if (currentUser == null || currentUser.getId() == null) {
+        if (currentUser == null || currentUser.getRecId() == null) {
             throw new AppException(Code.NOT_LOGIN_ERROR);
         }
         // 从数据库查询（追求性能的话可以注释，直接走缓存）
-        long userId = currentUser.getId();
+        long userId = currentUser.getRecId();
         currentUser = this.getById(userId);
         if (currentUser == null) {
             throw new AppException(Code.NOT_LOGIN_ERROR);
